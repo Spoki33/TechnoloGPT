@@ -1,0 +1,40 @@
+name: Generate or Edit PPTX File
+
+on:
+  push:
+    paths:
+      - '**.pptx'
+      - 'generate.py'
+
+jobs:
+  generate_pptx:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Install required Python packages
+        run: |
+          pip install python-pptx pandas openpyxl
+
+      - name: Install LibreOffice (for PDF export)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libreoffice
+
+      - name: Run Python script to edit/generate PPTX, PDF and XLSX
+        run: |
+          mkdir -p output
+          python generate.py
+
+      - name: Upload generated files (PPTX, PDF, XLSX)
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-documents
+          path: output/*
